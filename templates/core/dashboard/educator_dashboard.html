@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Educator Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="mb-0">Educator Dashboard</h1>
+            <p class="text-muted">Manage your content and track student performance</p>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <small class="text-muted">Your Modules</small>
+                    <h4 class="mb-0">{{ modules.count }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <small class="text-muted">Your Quizzes</small>
+                    <h4 class="mb-0">{{ quizzes.count }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <small class="text-muted">Quiz Attempts</small>
+                    <h4 class="mb-0">{{ total_attempts }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <small class="text-muted">Avg. Score</small>
+                    <h4 class="mb-0">{{ avg_score|default:"N/A"|floatformat:1 }}%</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your Modules -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Your Modules</h5>
+                    <a href="{% url 'module_create' %}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus"></i> Create Module
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if modules %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Difficulty</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for module in modules %}
+                                <tr>
+                                    <td><strong>{{ module.title }}</strong></td>
+                                    <td><span class="badge bg-{{ module.status }}">{{ module.get_status_display }}</span></td>
+                                    <td>{{ module.get_difficulty_level_display }}</td>
+                                    <td>{{ module.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'module_detail' module.slug %}" class="btn btn-sm btn-outline-primary">View</a>
+                                        <a href="{% url 'module_edit' module.slug %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted py-4">No modules created yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your Quizzes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Your Quizzes</h5>
+                    <a href="{% url 'quiz_create' %}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus"></i> Create Quiz
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if quizzes %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Module</th>
+                                    <th>Questions</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for quiz in quizzes %}
+                                <tr>
+                                    <td><strong>{{ quiz.title }}</strong></td>
+                                    <td>{{ quiz.module.title }}</td>
+                                    <td>{{ quiz.total_questions }}</td>
+                                    <td>
+                                        {% if quiz.is_published %}
+                                        <span class="badge bg-success">Published</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">Draft</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'quiz_detail' quiz.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted py-4">No quizzes created yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

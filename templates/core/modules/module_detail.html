@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}{{ module.title }} - Learning Module{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Module Header -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mx-auto">
+            {% if module.image %}
+            <img src="{{ module.image.url }}" alt="{{ module.title }}" class="img-fluid rounded-3 mb-4" style="max-height: 400px; object-fit: cover; width: 100%;">
+            {% endif %}
+            
+            <h1 class="mb-3">{{ module.title }}</h1>
+            <p class="lead text-muted">{{ module.description }}</p>
+            
+            <div class="d-flex gap-3 flex-wrap mb-4">
+                <span class="badge bg-primary">{{ module.get_difficulty_level_display }}</span>
+                <span class="badge bg-light text-dark"><i class="bi bi-clock"></i> {{ module.estimated_time }} min</span>
+                <span class="badge bg-light text-dark"><i class="bi bi-person"></i> {{ module.created_by.get_full_name|default:module.created_by.username }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module Content -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h4>Module Content</h4>
+                    <hr>
+                    {{ module.content|linebreaks }}
+                    
+                    {% if module.attachment %}
+                    <div class="mt-4 pt-4 border-top">
+                        <h5>Additional Resources</h5>
+                        <a href="{{ module.attachment.url }}" class="btn btn-outline-primary" download>
+                            <i class="bi bi-download"></i> Download Attachment
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quizzes Section -->
+    {% if quizzes %}
+    <div class="row mb-4">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Related Quizzes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for quiz in quizzes %}
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h6 class="mb-1">{{ quiz.title }}</h6>
+                                    <small class="text-muted">
+                                        <span class="badge bg-light text-dark">{{ quiz.get_difficulty_display }}</span>
+                                        {{ quiz.total_questions }} questions • {{ quiz.passing_score }}% to pass
+                                    </small>
+                                </div>
+                                <div class="col-auto">
+                                    {% if user.is_authenticated and user.is_citizen %}
+                                    <a href="{% url 'quiz_detail' quiz.pk %}" class="btn btn-sm btn-primary">Take Quiz</a>
+                                    {% else %}
+                                    <a href="{% url 'quiz_detail' quiz.pk %}" class="btn btn-sm btn-outline-primary">View Quiz</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Discussion Section -->
+    {% if discussions %}
+    <div class="row mb-4">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Discussion Forum</h5>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'thread_create' %}" class="btn btn-sm btn-primary">Start Discussion</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% for discussion in discussions %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <h6><a href="{% url 'thread_detail' discussion.pk %}" class="text-decoration-none">{{ discussion.title }}</a></h6>
+                        <small class="text-muted">
+                            by <strong>{{ discussion.author.username }}</strong> • 
+                            {{ discussion.comments.count }} comments • 
+                            {{ discussion.views_count }} views
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .card {
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
+    }
+</style>
+{% endblock %}

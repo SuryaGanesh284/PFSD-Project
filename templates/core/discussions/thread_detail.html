@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}{{ thread.title }} - Forum Discussion{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Thread Header -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            {% if thread.is_pinned %}
+                            <span class="badge bg-warning text-dark me-2">
+                                <i class="bi bi-pin-fill"></i> Pinned
+                            </span>
+                            {% endif %}
+                            {% if thread.status == 'closed' %}
+                            <span class="badge bg-secondary me-2">
+                                <i class="bi bi-lock"></i> Closed
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% if user == thread.author or user.is_admin_user %}
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'thread_edit' thread.pk %}">Edit</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <h1 class="mb-3">{{ thread.title }}</h1>
+                    
+                    <div class="d-flex align-items-center text-muted small mb-3">
+                        {% if thread.author.profile_image %}
+                            <img src="{{ thread.author.profile_image.url }}" alt="{{ thread.author.username }}" 
+                                 class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle bg-light me-2 d-flex align-items-center justify-content-center" 
+                                 style="width: 32px; height: 32px;">
+                                <i class="bi bi-person text-muted" style="font-size: 0.7rem;"></i>
+                            </div>
+                        {% endif %}
+                        <span><strong>{{ thread.author.get_full_name|default:thread.author.username }}</strong></span>
+                        <span class="mx-2">•</span>
+                        <span>{{ thread.created_at|date:"M d, Y H:i" }}</span>
+                        {% if thread.updated_at != thread.created_at %}
+                        <span class="mx-2">•</span>
+                        <span>Updated {{ thread.updated_at|timesince }} ago</span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if thread.module %}
+                    <p class="text-muted mb-0">
+                        <strong>Related:</strong> 
+                        <a href="{% url 'module_detail' thread.module.slug %}" class="text-decoration-none">
+                            {{ thread.module.title }}
+                        </a>
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Thread Content -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    {{ thread.content|linebreaks }}
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="row mb-4">
+                <div class="col">
+                    <h5>{{ comments.count }} Comments</h5>
+                </div>
+            </div>
+
+            <!-- Comments List -->
+            {% for comment in comments %}
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center">
+                            {% if comment.author.profile_image %}
+                                <img src="{{ comment.author.profile_image.url }}" alt="{{ comment.author.username }}" 
+                                     class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-light me-3 d-flex align-items-center justify-content-center" 
+                                     style="width: 40px; height: 40px;">
+                                    <i class="bi bi-person text-muted"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <strong>{{ comment.author.get_full_name|default:comment.author.username }}</strong><br>
+                                <small class="text-muted">{{ comment.created_at|timesince }} ago</small>
+                                {% if comment.is_edited %}
+                                <span class="badge bg-light text-dark">Edited</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if user == comment.author %}
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#">Edit</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="mb-3">{{ comment.content|linebreaks }}</p>
+                    
+                    <div class="d-flex gap-3">
+                        <button class="btn btn-sm btn-light" onclick="likeComment({{ comment.id }})">
+                            <i class="bi bi-heart"></i> <span id="likes-{{ comment.id }}">{{ comment.likes_count }}</span>
+                        </button>
+                        {% if user.is_authenticated %}
+                        <button class="btn btn-sm btn-light">
+                            <i class="bi bi-reply"></i> Reply
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">No comments yet. Be the first to comment!</div>
+            {% endfor %}
+
+            <!-- Add Comment Form -->
+            {% if user.is_authenticated and thread.status == 'open' %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h6 class="mb-3">Write a Comment</h6>
+                    <form method="post" action="{% url 'add_comment' thread.pk %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ comment_form.content }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Post Comment</button>
+                    </form>
+                </div>
+            </div>
+            {% elif not user.is_authenticated %}
+            <div class="alert alert-info">
+                <a href="{% url 'login' %}" class="alert-link">Log in</a> to comment on this discussion.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function likeComment(commentId) {
+        fetch(`/comments/${commentId}/like/`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById(`likes-${commentId}`).textContent = data.likes_count;
+        });
+    }
+</script>
+{% endblock %}

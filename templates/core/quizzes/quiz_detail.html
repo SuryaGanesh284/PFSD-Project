@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}{{ quiz.title }} - Quiz{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-5">
+                    <h1 class="mb-2">{{ quiz.title }}</h1>
+                    <p class="text-muted">{{ quiz.module.title }}</p>
+                    <hr>
+                    
+                    <p>{{ quiz.description }}</p>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <small class="text-muted">Difficulty</small>
+                            <p class="mb-0"><span class="badge bg-primary">{{ quiz.get_difficulty_display }}</span></p>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">Total Questions</small>
+                            <p class="mb-0"><strong>{{ quiz.total_questions }}</strong></p>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">Passing Score</small>
+                            <p class="mb-0"><strong>{{ quiz.passing_score }}%</strong></p>
+                        </div>
+                    </div>
+
+                    {% if quiz.time_limit %}
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-info-circle"></i> 
+                        Time Limit: <strong>{{ quiz.time_limit }} minutes</strong>
+                    </div>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                        {% if user.is_citizen %}
+                            {% if can_attempt %}
+                                <div class="alert alert-success">
+                                    <strong>Ready to take the quiz?</strong><br>
+                                    You have attempted this quiz {{ user_attempts }} time(s).
+                                </div>
+                                <a href="{% url 'quiz_take' quiz.pk %}" class="btn btn-lg btn-success w-100">
+                                    <i class="bi bi-play-fill"></i> Start Quiz
+                                </a>
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    <strong>Maximum Attempts Reached</strong><br>
+                                    You have reached the maximum number of attempts for this quiz ({{ quiz.max_attempts }}).
+                                </div>
+                            {% endif %}
+
+                            {% if best_attempt %}
+                            <hr>
+                            <div class="alert alert-info">
+                                <strong>Your Best Attempt:</strong> {{ best_attempt.percentage|floatformat:1 }}% 
+                                {% if best_attempt.is_passed %}
+                                    <span class="badge bg-success">Passed</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Failed</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                    <div class="alert alert-info">
+                        Please <a href="{% url 'login' %}" class="alert-link">log in</a> to take this quiz.
+                    </div>
+                    <a href="{% url 'login' %}" class="btn btn-lg btn-primary w-100">Login to Continue</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quiz Information -->
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="text-muted mb-2">Quiz Settings</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-shuffle"></i> {% if quiz.shuffle_questions %}Questions shuffled{% else %}Questions in order{% endif %}</li>
+                                <li><i class="bi bi-eye"></i> {% if quiz.show_answers %}Answers shown{% else %}Answers hidden{% endif %} after completion</li>
+                                <li><i class="bi bi-arrow-repeat"></i> {% if quiz.max_attempts %}{{ quiz.max_attempts }} attempts max{% else %}Unlimited attempts{% endif %}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="text-muted mb-2">Related Module</h6>
+                            <a href="{% url 'module_detail' quiz.module.slug %}" class="text-decoration-none">
+                                <strong>{{ quiz.module.title }}</strong>
+                                <br>
+                                <small class="text-muted">Review before taking the quiz</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

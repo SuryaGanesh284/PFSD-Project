@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Discussion Forum{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="mb-2">Discussion Forum</h1>
+            <p class="text-muted">Join our community discussions</p>
+        </div>
+        {% if user.is_authenticated %}
+        <div class="col-auto">
+            <a href="{% url 'thread_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus"></i> Start Discussion
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Threads List -->
+    <div class="row">
+        <div class="col-lg-8">
+            {% for thread in threads %}
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            {% if thread.is_pinned %}
+                            <span class="badge bg-warning text-dark me-2">
+                                <i class="bi bi-pin-fill"></i> Pinned
+                            </span>
+                            {% endif %}
+                            
+                            <h5 class="mb-2">
+                                <a href="{% url 'thread_detail' thread.pk %}" class="text-decoration-none">
+                                    {{ thread.title }}
+                                </a>
+                            </h5>
+                            
+                            <p class="text-muted small mb-0">
+                                by <strong>{{ thread.author.username }}</strong>
+                                • {{ thread.created_at|timesince }} ago
+                                {% if thread.module %}
+                                • <a href="{% url 'module_detail' thread.module.slug %}" class="text-decoration-none">{{ thread.module.title }}</a>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="text-end">
+                            <div class="small text-muted">
+                                <div><i class="bi bi-chat-dots"></i> {{ thread.comments.count }} comments</div>
+                                <div><i class="bi bi-eye"></i> {{ thread.views_count }} views</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-3">
+                    
+                    <p class="mb-0">{{ thread.content|truncatewords:30 }}</p>
+                    
+                    {% if thread.content|truncatewords:30|wordcount > 30 %}
+                    <a href="{% url 'thread_detail' thread.pk %}" class="text-decoration-none">Read more...</a>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'thread_detail' thread.pk %}" class="btn btn-sm btn-outline-primary">
+                        View Thread <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">
+                No discussions yet. <a href="{% url 'thread_create' %}">Start one!</a>
+            </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page=1">First</a></li>
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                    {% endif %}
+                    
+                    <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h6 class="mb-0">Forum Stats</h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Total Discussions</p>
+                    <h4 class="mb-3">{{ paginator.count }}</h4>
+                    
+                    <p class="text-muted small mb-1">Guidelines</p>
+                    <ul class="list-unstyled small">
+                        <li>✓ Be respectful</li>
+                        <li>✓ Stay on topic</li>
+                        <li>✓ No spam or ads</li>
+                        <li>✓ Search before posting</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

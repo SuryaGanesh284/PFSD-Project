@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Quiz{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">{% if form.instance.pk %}Edit Quiz{% else %}Create New Quiz{% endif %}</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            {% for error in form.non_field_errors %}
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                {{ error }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- Basic Info -->
+                        <h6 class="mb-3">Basic Information</h6>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.module.id_for_label }}" class="form-label">{{ form.module.label }}</label>
+                            {{ form.module }}
+                            {% if form.module.errors %}<div class="text-danger small">{{ form.module.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Settings -->
+                        <h6 class="mb-3 mt-4">Quiz Settings</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.difficulty.id_for_label }}" class="form-label">{{ form.difficulty.label }}</label>
+                                {{ form.difficulty }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.passing_score.id_for_label }}" class="form-label">{{ form.passing_score.label }}</label>
+                                {{ form.passing_score }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.time_limit.id_for_label }}" class="form-label">{{ form.time_limit.label }}</label>
+                                {{ form.time_limit }}
+                                <small class="text-muted">Leave empty for no time limit</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.max_attempts.id_for_label }}" class="form-label">{{ form.max_attempts.label }}</label>
+                                {{ form.max_attempts }}
+                                <small class="text-muted">Leave empty for unlimited</small>
+                            </div>
+                        </div>
+
+                        <!-- Checkboxes -->
+                        <h6 class="mb-3 mt-4">Options</h6>
+                        
+                        <div class="form-check mb-3">
+                            {{ form.shuffle_questions }}
+                            <label class="form-check-label" for="{{ form.shuffle_questions.id_for_label }}">
+                                {{ form.shuffle_questions.label }}
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            {{ form.show_answers }}
+                            <label class="form-check-label" for="{{ form.show_answers.id_for_label }}">
+                                {{ form.show_answers.label }}
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            {{ form.is_published }}
+                            <label class="form-check-label" for="{{ form.is_published.id_for_label }}">
+                                {{ form.is_published.label }}
+                            </label>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-3 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                {% if form.instance.pk %}Update Quiz{% else %}Create Quiz{% endif %}
+                            </button>
+                            {% if form.instance.pk %}
+                                <a href="{% url 'quiz_detail' form.instance.pk %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                            {% else %}
+                                <a href="{% url 'quiz_list' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if form.instance.pk %}
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Quiz Management</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">After saving, you can add questions to this quiz.</p>
+                    <a href="#" class="btn btn-outline-primary" disabled>Add Questions (Coming Soon)</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+</style>
+{% endblock %}

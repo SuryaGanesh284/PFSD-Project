@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Take Quiz - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Quiz Header -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col">
+                            <h2>{{ quiz.title }}</h2>
+                            <p class="text-muted">Question <span id="current-q">1</span> of {{ question_count }}</p>
+                        </div>
+                        {% if quiz.time_limit %}
+                        <div class="col-auto text-end">
+                            <div class="timer-badge">
+                                <small class="text-muted">Time Remaining</small>
+                                <h4 class="mb-0" id="timer">{{ quiz.time_limit }}:00</h4>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="progress mt-3">
+                        <div class="progress-bar" id="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Form -->
+            <form method="post" id="quiz-form">
+                {% csrf_token %}
+                
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Questions -->
+                {% for question in questions %}
+                <div class="card border-0 shadow-sm mb-4 question-card" data-q="{{ forloop.counter }}">
+                    <div class="card-body p-5">
+                        <h5 class="mb-4">
+                            <span class="badge bg-primary me-2">Q{{ forloop.counter }}</span>
+                            {{ question.text }}
+                        </h5>
+
+                        {% if question.choices.all %}
+                        <div class="options">
+                            {% for choice in question.choices.all %}
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="question_{{ question.id }}" 
+                                       id="choice_{{ choice.id }}" value="{{ choice.id }}" required>
+                                <label class="form-check-label" for="choice_{{ choice.id }}">
+                                    {{ choice.text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Submit Button -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-lg btn-success">
+                                <i class="bi bi-check-circle"></i> Submit Quiz
+                            </button>
+                            <a href="{% url 'quiz_detail' quiz.pk %}" class="btn btn-lg btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                        <small class="d-block mt-3 text-muted">
+                            <i class="bi bi-info-circle"></i> 
+                            Make sure you've answered all questions before submitting.
+                        </small>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timer-badge {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+    
+    .form-check-input {
+        cursor: pointer;
+        width: 1.25em;
+        height: 1.25em;
+    }
+    
+    .form-check-label {
+        cursor: pointer;
+        padding-left: 0.5rem;
+    }
+    
+    .question-card {
+        scroll-margin-top: 100px;
+    }
+</style>
+
+<script>
+    // Timer functionality
+    {% if quiz.time_limit %}
+    document.addEventListener('DOMContentLoaded', function() {
+        let totalSeconds = {{ quiz.time_limit }} * 60;
+        
+        setInterval(function() {
+            totalSeconds--;
+            let minutes = Math.floor(totalSeconds / 60);
+            let seconds = totalSeconds % 60;
+            
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            document.getElementById('timer').textContent = minutes + ':' + seconds;
+            
+            if (totalSeconds <= 0) {
+                document.getElementById('quiz-form').submit();
+            }
+        }, 1000);
+    });
+    {% endif %}
+
+    // Progress bar update
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('quiz-form');
+        const radioButtons = form.querySelectorAll('input[type="radio"]');
+        
+        function updateProgress() {
+            const totalQuestions = {{ question_count }};
+            const answered = form.querySelectorAll('input[type="radio"]:checked').length;
+            const progress = (answered / totalQuestions) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+        
+        radioButtons.forEach(button => {
+            button.addEventListener('change', updateProgress);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Indian Constitution Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold mb-4" style="color: #1e40af;">
+                Learn Your Constitutional Rights
+            </h1>
+            <p class="lead mb-4 text-muted">
+                Empower yourself with knowledge about the Indian Constitution. Explore comprehensive modules, take quizzes, and join our community forum.
+            </p>
+            {% if not user.is_authenticated %}
+                <div class="d-flex gap-3">
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Get Started</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">Login</a>
+                </div>
+            {% else %}
+                <a href="{% url 'module_list' %}" class="btn btn-primary btn-lg">Start Learning</a>
+            {% endif %}
+        </div>
+        <div class="col-lg-6">
+            <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=600&fit=crop" 
+                 alt="Learning" class="img-fluid rounded-3" style="box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body py-4">
+                    <h3 class="text-primary">{{ total_modules }}</h3>
+                    <p class="text-muted">Learning Modules</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body py-4">
+                    <h3 class="text-success">{{ total_users }}</h3>
+                    <p class="text-muted">Active Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body py-4">
+                    <h3 class="text-info">100%</h3>
+                    <p class="text-muted">Free Access</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body py-4">
+                    <h3 class="text-warning">24/7</h3>
+                    <p class="text-muted">Available</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Modules -->
+    <div class="mb-5">
+        <h2 class="mb-4">Featured Learning Modules</h2>
+        <div class="row">
+            {% for module in recent_modules %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        {% if module.image %}
+                            <img src="{{ module.image.url }}" class="card-img-top" alt="{{ module.title }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="bi bi-book-half text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ module.title }}</h5>
+                            <p class="card-text text-muted small">{{ module.description|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge" style="background-color: #1e40af;">{{ module.get_difficulty_level_display }}</span>
+                                <small class="text-muted">{{ module.estimated_time }} min</small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="{% url 'module_detail' module.slug %}" class="btn btn-sm btn-outline-primary w-100">
+                                Learn More <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">No modules available yet.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="mb-5">
+        <h2 class="mb-4 text-center">Why Choose Our Platform?</h2>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="d-flex">
+                    <div class="me-4">
+                        <div class="rounded-circle bg-primary text-white p-3 text-center" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-book"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5>Comprehensive Content</h5>
+                        <p class="text-muted">Structured learning modules covering all aspects of the Indian Constitution.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="d-flex">
+                    <div class="me-4">
+                        <div class="rounded-circle bg-success text-white p-3 text-center" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-check2-circle"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5>Interactive Quizzes</h5>
+                        <p class="text-muted">Test your knowledge with our interactive quizzes and track your progress.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="d-flex">
+                    <div class="me-4">
+                        <div class="rounded-circle bg-info text-white p-3 text-center" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-chat-dots"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5>Community Forum</h5>
+                        <p class="text-muted">Connect with learners and educators in our active discussion forum.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="d-flex">
+                    <div class="me-4">
+                        <div class="rounded-circle bg-warning text-dark p-3 text-center" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5>Progress Tracking</h5>
+                        <p class="text-muted">Monitor your learning progress with detailed analytics and insights.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    {% if not user.is_authenticated %}
+        <div class="bg-primary text-white rounded-4 p-5 text-center mb-5">
+            <h2 class="mb-3">Ready to Start Learning?</h2>
+            <p class="lead mb-4">Join thousands of learners exploring the Indian Constitution</p>
+            <a href="{% url 'register' %}" class="btn btn-light btn-lg">Create Free Account</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

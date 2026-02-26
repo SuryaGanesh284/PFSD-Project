@@ -399,38 +399,57 @@ Comments on threads.
 /modules/create/            → Create module
 /modules/<slug>/            → Module detail
 
-## Neo4j Integration (Optional)
+## PostgreSQL Database Setup
 
-This project can be extended with a Neo4j graph database using `neomodel`.
+This project uses PostgreSQL for the main relational database. By default the
+settings have been configured to read connection parameters from environment
+variables so you can easily swap between SQLite (for simple local testing) and
+PostgreSQL in development/production.
 
-Quick steps:
+1. Install and start a PostgreSQL server (local or remote). Create a database
+   and user, for example:
 
-1. Install Neo4j (Community or Desktop) and run it locally or use Aura/remote DB.
-2. Set connection URL as an environment variable (example):
-
-```powershell
-$env:NEOMODEL_NEO4J_BOLT_URL = 'bolt://neo4j:yourpassword@localhost:7687'
+```sql
+CREATE DATABASE constitution;
+CREATE USER myuser WITH ENCRYPTED PASSWORD 'secret';
+GRANT ALL PRIVILEGES ON DATABASE constitution TO myuser;
 ```
 
-3. Install Python deps (we already added these):
+2. Export the following environment variables (adjust values as needed):
+
+```bash
+export POSTGRES_DB=constitution
+export POSTGRES_USER=myuser
+export POSTGRES_PASSWORD=secret
+export POSTGRES_HOST=localhost
+export POSTGRES_PORT=5432
+```
+
+On Windows PowerShell:
+
+```powershell
+$env:POSTGRES_DB = 'constitution'
+$env:POSTGRES_USER = 'myuser'
+$env:POSTGRES_PASSWORD = 'secret'
+$env:POSTGRES_HOST = 'localhost'
+$env:POSTGRES_PORT = '5432'
+```
+
+3. Make sure `psycopg2-binary` is listed in `requirements.txt` and then install
+dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Test connection / create a sample node:
+4. Apply migrations to initialize the schema:
 
 ```bash
-python manage.py neo_test
+python manage.py migrate
 ```
 
-Files added to this repo for Neo4j integration:
-- `core/neo_models.py` — example `neomodel` nodes (`Person`).
-- `core/management/commands/neo_test.py` — test command that creates a `Person` node.
-
-Notes:
-- Configure `NEOMODEL_NEO4J_BOLT_URL` with correct credentials for production.
-- The neomodel connection is initialized in `core.apps.CoreConfig.ready()` so the AppConfig must be used (the project sets `core.apps.CoreConfig` in `INSTALLED_APPS`).
+You can continue to use the built‑in SQLite database by not setting any of the
+PostgreSQL environment variables; the code will fall back to a local file.
 
 /modules/<slug>/edit/       → Edit module
 

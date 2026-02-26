@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Learning Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="mb-0">Your Learning Dashboard</h1>
+            <p class="text-muted">Track your progress and continue learning</p>
+        </div>
+    </div>
+
+    <!-- Progress Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <small class="text-muted">Quizzes Completed</small>
+                    <h4 class="mb-0">{{ completed_quizzes }}</h4>
+                    <small class="text-success">out of {{ total_attempts }} attempts</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <small class="text-muted">Average Score</small>
+                    <h4 class="mb-0">{{ avg_score|default:"--"|floatformat:1 }}%</h4>
+                    {% if avg_score >= 60 %}
+                    <small class="text-success">Keep it up! 🎉</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <small class="text-muted">Total Modules</small>
+                    <h4 class="mb-0">{{ modules.count }}</h4>
+                    <small class="text-muted">Available to learn</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Attempts -->
+    {% if recent_attempts %}
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Recent Quiz Attempts</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% for attempt in recent_attempts %}
+                        <div class="timeline-item mb-4">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    {% if attempt.is_passed %}
+                                    <div class="rounded-circle bg-success text-white p-2">
+                                        <i class="bi bi-check"></i>
+                                    </div>
+                                    {% else %}
+                                    <div class="rounded-circle bg-danger text-white p-2">
+                                        <i class="bi bi-x"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <strong>{{ attempt.quiz.title }}</strong><br>
+                                            <small class="text-muted">
+                                                {% if attempt.completed_at %}
+                                                    Completed {{ attempt.completed_at|date:"M d, Y" }}
+                                                {% else %}
+                                                    In Progress
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                        {% if attempt.score %}
+                                        <div class="text-end">
+                                            <h6 class="mb-0">{{ attempt.percentage|floatformat:1 }}%</h6>
+                                            <small class="text-muted">{{ attempt.score }}/{{ attempt.total_possible_score }}</small>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Your Performance</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Pass Rate</p>
+                    <div class="progress mb-3">
+                        {% if total_attempts > 0 %}
+                            {% widthratio completed_quizzes total_attempts 100 as pass_rate %}
+                            <div class="progress-bar bg-success" style="width: {{ pass_rate }}%"></div>
+                        {% endif %}
+                    </div>
+                    <small class="text-muted">{{ completed_quizzes }} out of {{ total_attempts }} quizzes passed</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recommended Modules -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Continue Learning</h5>
+                    <a href="{% url 'module_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if modules %}
+                    <div class="row">
+                        {% for module in modules %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 border">
+                                {% if module.image %}
+                                <img src="{{ module.image.url }}" class="card-img-top" alt="{{ module.title }}" style="height: 150px; object-fit: cover;">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ module.title|truncatewords:5 }}</h6>
+                                    <p class="card-text text-muted small">{{ module.description|truncatewords:10 }}</p>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="badge bg-light text-dark">{{ module.get_difficulty_level_display }}</span>
+                                        <small class="text-muted">{{ module.estimated_time }} min</small>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <a href="{% url 'module_detail' module.slug %}" class="btn btn-sm btn-primary w-100">
+                                        Start Learning
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted">No modules available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline-item {
+        padding-bottom: 1rem;
+        border-left: 2px solid #dee2e6;
+        padding-left: 1rem;
+        margin-left: 1rem;
+    }
+</style>
+{% endblock %}

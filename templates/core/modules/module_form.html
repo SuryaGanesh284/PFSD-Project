@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Module{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">{% if form.instance.pk %}Edit Module{% else %}Create Learning Module{% endif %}</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            {% for error in form.non_field_errors %}
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                {{ error }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- Basic Information -->
+                        <h6 class="mb-3 mt-4">Basic Information</h6>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.slug.id_for_label }}" class="form-label">{{ form.slug.label }}</label>
+                            {{ form.slug }}
+                            <small class="text-muted">Auto-generated from title</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Content -->
+                        <h6 class="mb-3 mt-4">Module Content</h6>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.content.id_for_label }}" class="form-label">{{ form.content.label }}</label>
+                            {{ form.content }}
+                            {% if form.content.errors %}<div class="text-danger small">{{ form.content.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Media -->
+                        <h6 class="mb-3 mt-4">Media Files</h6>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.image.id_for_label }}" class="form-label">{{ form.image.label }}</label>
+                            {{ form.image }}
+                            <small class="text-muted">Cover image for the module</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.attachment.id_for_label }}" class="form-label">{{ form.attachment.label }}</label>
+                            {{ form.attachment }}
+                            <small class="text-muted">PDF or document file</small>
+                        </div>
+
+                        <!-- Settings -->
+                        <h6 class="mb-3 mt-4">Settings</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.difficulty_level.id_for_label }}" class="form-label">{{ form.difficulty_level.label }}</label>
+                                {{ form.difficulty_level }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}</label>
+                                {{ form.status }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.estimated_time.id_for_label }}" class="form-label">{{ form.estimated_time.label }}</label>
+                                {{ form.estimated_time }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.order.id_for_label }}" class="form-label">{{ form.order.label }}</label>
+                                {{ form.order }}
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-3 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                {% if form.instance.pk %}Update Module{% else %}Create Module{% endif %}
+                            </button>
+                            {% if form.instance.pk %}
+                                <a href="{% url 'module_detail' form.instance.slug %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                            {% else %}
+                                <a href="{% url 'module_list' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select, textarea {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+    
+    textarea {
+        font-family: 'Courier New', monospace;
+        font-size: 0.95rem;
+    }
+</style>
+{% endblock %}
