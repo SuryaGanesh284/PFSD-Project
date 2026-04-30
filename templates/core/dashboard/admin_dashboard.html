@@ -3,130 +3,112 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row mb-4">
+<div class="container-fluid py-4">
+    <div class="row mb-5 fade-in">
         <div class="col">
-            <h1 class="mb-0">Admin Dashboard</h1>
-            <p class="text-muted">Overview and management of platform</p>
+            <h1 class="display-6 fw-bold mb-1">Admin Dashboard</h1>
+            <p class="text-muted fs-5">Overview and management of platform</p>
         </div>
     </div>
 
     <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-primary text-white rounded-circle p-3 me-3">
-                            <i class="bi bi-people" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <div>
-                            <small class="text-muted">Total Users</small>
-                            <h4 class="mb-0">{{ total_users }}</h4>
-                        </div>
+    <div class="row mb-5 fade-in" style="animation-delay: 0.1s;">
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card h-100">
+                <div class="d-flex w-100 align-items-center">
+                    <div class="stat-icon primary"><i class="bi bi-people"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ total_users }}</h3>
+                        <p>Total Users</p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-success text-white rounded-circle p-3 me-3">
-                            <i class="bi bi-book" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <div>
-                            <small class="text-muted">Learning Modules</small>
-                            <h4 class="mb-0">{{ total_modules }}</h4>
-                        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card h-100">
+                <div class="d-flex w-100 align-items-center">
+                    <div class="stat-icon success"><i class="bi bi-journal-text"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ total_modules }}</h3>
+                        <p>Learning Modules</p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-info text-white rounded-circle p-3 me-3">
-                            <i class="bi bi-question-circle" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <div>
-                            <small class="text-muted">Quizzes</small>
-                            <h4 class="mb-0">{{ total_quizzes }}</h4>
-                        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card h-100">
+                <div class="d-flex w-100 align-items-center">
+                    <div class="stat-icon info" style="background: linear-gradient(135deg, #e0f2fe, #bae6fd); color: var(--info);"><i class="bi bi-question-circle"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ total_quizzes }}</h3>
+                        <p>Quizzes</p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-warning text-dark rounded-circle p-3 me-3">
-                            <i class="bi bi-graph-up" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <div>
-                            <small class="text-muted">Quiz Attempts</small>
-                            <h4 class="mb-0">{{ total_attempts }}</h4>
-                        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card h-100">
+                <div class="d-flex w-100 align-items-center">
+                    <div class="stat-icon warning"><i class="bi bi-graph-up"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ total_attempts }}</h3>
+                        <p>Quiz Attempts</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Recent Users -->
-    <div class="row mb-4">
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">Recent Users</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <tbody>
-                                {% for user in recent_users %}
-                                <tr>
-                                    <td>
-                                        <strong>{{ user.username }}</strong><br>
-                                        <small class="text-muted">{{ user.email }}</small>
-                                    </td>
-                                    <td class="text-end">
-                                        <span class="role-badge {{ user.role }}">{{ user.get_role_display }}</span>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr><td colspan="2" class="text-center text-muted">No users yet</td></tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+    <!-- Recent Users and Modules -->
+    <div class="row mb-5 fade-in" style="animation-delay: 0.2s;">
+        <div class="col-lg-6 mb-4">
+            <div class="glass-panel p-4 h-100">
+                <h4 class="fw-bold mb-4 border-bottom pb-3">Recent Users</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <tbody>
+                            {% for user in recent_users %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded-circle p-2 me-3 text-primary">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        <div>
+                                            <strong class="d-block text-dark">{{ user.username }}</strong>
+                                            <small class="text-muted">{{ user.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <span class="role-badge {{ user.role }}">{{ user.get_role_display }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="2" class="text-center text-muted py-4">No users yet</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Modules -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">Recent Modules</h5>
-                </div>
-                <div class="card-body">
+        <div class="col-lg-6 mb-4">
+            <div class="glass-panel p-4 h-100">
+                <h4 class="fw-bold mb-4 border-bottom pb-3">Recent Modules</h4>
+                <div class="d-flex flex-column gap-3">
                     {% for module in recent_modules %}
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <strong>{{ module.title }}</strong><br>
-                                <small class="text-muted">by {{ module.created_by.username }}</small>
-                            </div>
-                            <span class="badge bg-{{ module.get_status_display|lower }}">
-                                {{ module.get_status_display }}
-                            </span>
+                    <div class="p-3 bg-white rounded-3 shadow-sm d-flex justify-content-between align-items-center transition-all hover-lift">
+                        <div>
+                            <strong class="d-block text-dark mb-1">{{ module.title }}</strong>
+                            <small class="text-muted"><i class="bi bi-person"></i> {{ module.created_by.username }}</small>
                         </div>
+                        <span class="badge bg-{{ module.get_status_display|lower|default:'secondary' }} px-3 py-2 rounded-pill">
+                            {{ module.get_status_display }}
+                        </span>
                     </div>
                     {% empty %}
-                    <p class="text-center text-muted">No modules yet</p>
+                    <div class="text-center text-muted py-4">No modules yet</div>
                     {% endfor %}
                 </div>
             </div>
@@ -134,16 +116,14 @@
     </div>
 
     <!-- Quick Actions -->
-    <div class="row">
+    <div class="row fade-in" style="animation-delay: 0.3s;">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">Quick Actions</h5>
-                </div>
-                <div class="card-body">
-                    <a href="/admin/" class="btn btn-primary me-2"><i class="bi bi-gear"></i> Django Admin Panel</a>
-                    <a href="{% url 'module_list' %}" class="btn btn-outline-primary me-2"><i class="bi bi-book"></i> View Modules</a>
-                    <a href="{% url 'quiz_list' %}" class="btn btn-outline-primary me-2"><i class="bi bi-question-circle"></i> View Quizzes</a>
+            <div class="glass-panel p-4">
+                <h4 class="fw-bold mb-4 border-bottom pb-3">Quick Actions</h4>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="/admin/" class="btn btn-primary shadow-sm"><i class="bi bi-gear me-2"></i> Django Admin Panel</a>
+                    <a href="{% url 'module_list' %}" class="btn btn-secondary shadow-sm"><i class="bi bi-book me-2"></i> View Modules</a>
+                    <a href="{% url 'quiz_list' %}" class="btn btn-info shadow-sm text-white"><i class="bi bi-question-circle me-2"></i> View Quizzes</a>
                 </div>
             </div>
         </div>

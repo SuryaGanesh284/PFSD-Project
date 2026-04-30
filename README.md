@@ -399,57 +399,65 @@ Comments on threads.
 /modules/create/            → Create module
 /modules/<slug>/            → Module detail
 
-## PostgreSQL Database Setup
+## MySQL Database Setup
 
-This project uses PostgreSQL for the main relational database. By default the
-settings have been configured to read connection parameters from environment
-variables so you can easily swap between SQLite (for simple local testing) and
-PostgreSQL in development/production.
+This project uses MySQL as the primary relational database. The settings read
+connection parameters from environment variables, but if `MYSQL_DATABASE` is
+not defined the project falls back to the built-in SQLite file for easy
+local development.
 
-1. Install and start a PostgreSQL server (local or remote). Create a database
-   and user, for example:
+1. Install MySQL server (8.0 CE or equivalent) on your machine or a remote
+   host. Create a database and user, for example using the MySQL client or
+   MySQL Workbench SQL editor:
 
 ```sql
 CREATE DATABASE constitution;
-CREATE USER myuser WITH ENCRYPTED PASSWORD 'secret';
-GRANT ALL PRIVILEGES ON DATABASE constitution TO myuser;
+CREATE USER 'myuser'@'localhost' IDENTIFIED BY 'secret';
+GRANT ALL PRIVILEGES ON constitution.* TO 'myuser'@'localhost';
+FLUSH PRIVILEGES;
 ```
 
-2. Export the following environment variables (adjust values as needed):
+2. Set the following environment variables (adjust values accordingly):
 
 ```bash
-export POSTGRES_DB=constitution
-export POSTGRES_USER=myuser
-export POSTGRES_PASSWORD=secret
-export POSTGRES_HOST=localhost
-export POSTGRES_PORT=5432
+export MYSQL_DATABASE=constitution
+export MYSQL_USER=myuser
+export MYSQL_PASSWORD=secret
+export MYSQL_HOST=localhost
+export MYSQL_PORT=3306
 ```
 
-On Windows PowerShell:
+For Windows PowerShell:
 
 ```powershell
-$env:POSTGRES_DB = 'constitution'
-$env:POSTGRES_USER = 'myuser'
-$env:POSTGRES_PASSWORD = 'secret'
-$env:POSTGRES_HOST = 'localhost'
-$env:POSTGRES_PORT = '5432'
+$env:MYSQL_DATABASE = 'constitution'
+$env:MYSQL_USER = 'myuser'
+$env:MYSQL_PASSWORD = 'secret'
+$env:MYSQL_HOST = 'localhost'
+$env:MYSQL_PORT = '3306'
 ```
 
-3. Make sure `psycopg2-binary` is listed in `requirements.txt` and then install
-dependencies:
+3. Ensure `mysqlclient` is listed in `requirements.txt` then install:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Apply migrations to initialize the schema:
+4. Apply migrations:
 
 ```bash
 python manage.py migrate
 ```
 
-You can continue to use the built‑in SQLite database by not setting any of the
-PostgreSQL environment variables; the code will fall back to a local file.
+### Connecting with MySQL Workbench
+
+- Open MySQL Workbench and create a new **MySQL Connections** entry.
+- Use the host/port and user credentials from the environment variables above.
+- Click **Test Connection** to verify access. Once connected you can browse the
+  `constitution` schema and run queries against it.
+
+You can still develop without a MySQL server by omitting the variables; the
+project will use SQLite.
 
 /modules/<slug>/edit/       → Edit module
 

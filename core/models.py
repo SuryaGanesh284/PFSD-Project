@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils.text import slugify
 
 
 class CustomUser(AbstractUser):
@@ -147,6 +148,17 @@ class LearningModule(models.Model):
             models.Index(fields=['status', 'order']),
             models.Index(fields=['slug']),
         ]
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            # Generate unique slug
+            base_slug = slugify(self.title)
+            self.slug = base_slug
+            counter = 1
+            while LearningModule.objects.filter(slug=self.slug).exists():
+                self.slug = f"{base_slug}-{counter}"
+                counter += 1
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return self.title
@@ -303,6 +315,17 @@ class Question(models.Model):
     
     def __str__(self):
         return f"{self.quiz.title} - Q{self.order}: {self.text[:50]}"
+        
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.quiz:
+            self.quiz.update_question_count()
+            
+    def delete(self, *args, **kwargs):
+        quiz = self.quiz
+        super().delete(*args, **kwargs)
+        if quiz:
+            quiz.update_question_count()
 
 
 class Choice(models.Model):

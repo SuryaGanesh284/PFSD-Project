@@ -69,16 +69,12 @@ class LearningModuleForm(forms.ModelForm):
     
     class Meta:
         model = LearningModule
-        fields = ('title', 'slug', 'description', 'content', 'image', 'attachment',
+        fields = ('title', 'description', 'content', 'image', 'attachment',
                   'difficulty_level', 'estimated_time', 'status', 'order')
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Module title'
-            }),
-            'slug': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'URL slug (auto-generated)'
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',

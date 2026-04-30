@@ -3,42 +3,50 @@
 {% block title %}Learning Dashboard{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row mb-4">
+<div class="container-fluid py-4">
+    <div class="row mb-5 fade-in">
         <div class="col">
-            <h1 class="mb-0">Your Learning Dashboard</h1>
-            <p class="text-muted">Track your progress and continue learning</p>
+            <h1 class="display-6 fw-bold mb-1">Your Learning Dashboard</h1>
+            <p class="text-muted fs-5">Track your progress and continue learning</p>
         </div>
     </div>
 
     <!-- Progress Cards -->
-    <div class="row mb-4">
-        <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <small class="text-muted">Quizzes Completed</small>
-                    <h4 class="mb-0">{{ completed_quizzes }}</h4>
-                    <small class="text-success">out of {{ total_attempts }} attempts</small>
+    <div class="row mb-5 fade-in" style="animation-delay: 0.1s;">
+        <div class="col-md-4 mb-4">
+            <div class="card stat-card h-100">
+                <div class="d-flex w-100 align-items-center">
+                    <div class="stat-icon success"><i class="bi bi-check-circle"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ completed_quizzes }}</h3>
+                        <p>Quizzes Completed <small class="d-block text-success mt-1">out of {{ total_attempts }} attempts</small></p>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <small class="text-muted">Average Score</small>
-                    <h4 class="mb-0">{{ avg_score|default:"--"|floatformat:1 }}%</h4>
-                    {% if avg_score >= 60 %}
-                    <small class="text-success">Keep it up! 🎉</small>
-                    {% endif %}
+        <div class="col-md-4 mb-4">
+            <div class="card stat-card h-100">
+                <div class="d-flex w-100 align-items-center">
+                    <div class="stat-icon warning"><i class="bi bi-star"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ avg_score|default:"--"|floatformat:1 }}%</h3>
+                        <p>Average Score 
+                            {% if avg_score >= 60 %}
+                            <small class="d-block text-success mt-1 fw-bold">Keep it up! 🎉</small>
+                            {% endif %}
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <small class="text-muted">Total Modules</small>
-                    <h4 class="mb-0">{{ modules.count }}</h4>
-                    <small class="text-muted">Available to learn</small>
+        <div class="col-md-4 mb-4">
+            <div class="card stat-card h-100">
+                <div class="d-flex w-100 align-items-center">
+                    <div class="stat-icon primary"><i class="bi bi-journal-album"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ modules.count }}</h3>
+                        <p>Total Modules <small class="d-block text-muted mt-1">Available to learn</small></p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -46,69 +54,64 @@
 
     <!-- Recent Attempts -->
     {% if recent_attempts %}
-    <div class="row mb-4">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">Recent Quiz Attempts</h5>
-                </div>
-                <div class="card-body">
-                    <div class="timeline">
-                        {% for attempt in recent_attempts %}
-                        <div class="timeline-item mb-4">
-                            <div class="d-flex">
-                                <div class="me-3">
-                                    {% if attempt.is_passed %}
-                                    <div class="rounded-circle bg-success text-white p-2">
-                                        <i class="bi bi-check"></i>
+    <div class="row mb-5 fade-in" style="animation-delay: 0.2s;">
+        <div class="col-lg-8 mb-4">
+            <div class="glass-panel p-4 h-100">
+                <h4 class="fw-bold mb-4 border-bottom pb-3">Recent Quiz Attempts</h4>
+                <div class="timeline mt-4">
+                    {% for attempt in recent_attempts %}
+                    <div class="timeline-item mb-4 position-relative">
+                        <div class="timeline-dot"></div>
+                        <div class="d-flex">
+                            <div class="me-3 mt-1">
+                                {% if attempt.is_passed %}
+                                <div class="rounded-circle bg-success text-white p-2 d-flex align-items-center justify-content-center" style="width:35px; height:35px; box-shadow: 0 4px 10px rgba(16,185,129,0.3);">
+                                    <i class="bi bi-check fs-5"></i>
+                                </div>
+                                {% else %}
+                                <div class="rounded-circle bg-danger text-white p-2 d-flex align-items-center justify-content-center" style="width:35px; height:35px; box-shadow: 0 4px 10px rgba(239,68,68,0.3);">
+                                    <i class="bi bi-x fs-5"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1 bg-white p-3 rounded-3 shadow-sm transition-all hover-lift">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong class="fs-5 text-dark">{{ attempt.quiz.title }}</strong><br>
+                                        <small class="text-muted">
+                                            {% if attempt.completed_at %}
+                                                <i class="bi bi-calendar"></i> Completed {{ attempt.completed_at|date:"M d, Y" }}
+                                            {% else %}
+                                                <i class="bi bi-hourglass-split"></i> In Progress
+                                            {% endif %}
+                                        </small>
                                     </div>
-                                    {% else %}
-                                    <div class="rounded-circle bg-danger text-white p-2">
-                                        <i class="bi bi-x"></i>
+                                    {% if attempt.score %}
+                                    <div class="text-end">
+                                        <h5 class="mb-0 fw-bold text-primary">{{ attempt.percentage|floatformat:1 }}%</h5>
+                                        <small class="text-muted">{{ attempt.score }}/{{ attempt.total_possible_score }}</small>
                                     </div>
                                     {% endif %}
                                 </div>
-                                <div class="flex-grow-1">
-                                    <div class="d-flex justify-content-between">
-                                        <div>
-                                            <strong>{{ attempt.quiz.title }}</strong><br>
-                                            <small class="text-muted">
-                                                {% if attempt.completed_at %}
-                                                    Completed {{ attempt.completed_at|date:"M d, Y" }}
-                                                {% else %}
-                                                    In Progress
-                                                {% endif %}
-                                            </small>
-                                        </div>
-                                        {% if attempt.score %}
-                                        <div class="text-end">
-                                            <h6 class="mb-0">{{ attempt.percentage|floatformat:1 }}%</h6>
-                                            <small class="text-muted">{{ attempt.score }}/{{ attempt.total_possible_score }}</small>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
                             </div>
                         </div>
-                        {% endfor %}
                     </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">Your Performance</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted small">Pass Rate</p>
-                    <div class="progress mb-3">
+        <div class="col-lg-4 mb-4">
+            <div class="glass-panel p-4 h-100">
+                <h4 class="fw-bold mb-4 border-bottom pb-3">Your Performance</h4>
+                <div class="mt-4">
+                    <p class="text-muted small fw-bold text-uppercase tracking-wide mb-2">Pass Rate</p>
+                    <div class="progress mb-3" style="height: 12px;">
                         {% if total_attempts > 0 %}
                             {% widthratio completed_quizzes total_attempts 100 as pass_rate %}
                             <div class="progress-bar bg-success" style="width: {{ pass_rate }}%"></div>
                         {% endif %}
                     </div>
-                    <small class="text-muted">{{ completed_quizzes }} out of {{ total_attempts }} quizzes passed</small>
+                    <small class="text-muted fw-bold">{{ completed_quizzes }} out of {{ total_attempts }} quizzes passed</small>
                 </div>
             </div>
         </div>
@@ -116,54 +119,46 @@
     {% endif %}
 
     <!-- Recommended Modules -->
-    <div class="row">
+    <div class="row fade-in" style="animation-delay: 0.3s;">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Continue Learning</h5>
-                    <a href="{% url 'module_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            <div class="glass-panel p-4">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                    <h4 class="fw-bold mb-0">Continue Learning</h4>
+                    <a href="{% url 'module_list' %}" class="btn btn-secondary btn-sm">View All Modules</a>
                 </div>
-                <div class="card-body">
-                    {% if modules %}
-                    <div class="row">
-                        {% for module in modules %}
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100 border">
-                                {% if module.image %}
-                                <img src="{{ module.image.url }}" class="card-img-top" alt="{{ module.title }}" style="height: 150px; object-fit: cover;">
-                                {% endif %}
-                                <div class="card-body">
-                                    <h6 class="card-title">{{ module.title|truncatewords:5 }}</h6>
-                                    <p class="card-text text-muted small">{{ module.description|truncatewords:10 }}</p>
-                                    <div class="d-flex justify-content-between">
-                                        <span class="badge bg-light text-dark">{{ module.get_difficulty_level_display }}</span>
-                                        <small class="text-muted">{{ module.estimated_time }} min</small>
-                                    </div>
+                
+                {% if modules %}
+                <div class="row">
+                    {% for module in modules|slice:":3" %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 module-card">
+                            {% if module.image %}
+                                <div class="module-card-image" style="background-image: url('{{ module.image.url }}'); background-size: cover; background-position: center;"></div>
+                            {% else %}
+                                <div class="module-card-image d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, var(--primary-light), var(--primary));">
+                                    <i class="bi bi-book text-white" style="font-size: 3rem; opacity: 0.5;"></i>
                                 </div>
-                                <div class="card-footer bg-transparent">
-                                    <a href="{% url 'module_detail' module.slug %}" class="btn btn-sm btn-primary w-100">
-                                        Start Learning
-                                    </a>
-                                </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <span class="badge bg-primary mb-2">{{ module.get_difficulty_level_display }}</span>
+                                <h6 class="card-title fw-bold mb-2">{{ module.title|truncatewords:8 }}</h6>
+                                <p class="card-text text-muted small">{{ module.description|truncatewords:12 }}</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0 pb-3 pt-0 px-3">
+                                <a href="{% url 'module_detail' module.slug %}" class="btn btn-primary btn-sm w-100">Start Learning</a>
                             </div>
                         </div>
-                        {% endfor %}
                     </div>
-                    {% else %}
-                    <p class="text-center text-muted">No modules available</p>
-                    {% endif %}
+                    {% endfor %}
                 </div>
+                {% else %}
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-journal-x fs-1 text-light mb-3"></i>
+                    <p>No modules available</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    .timeline-item {
-        padding-bottom: 1rem;
-        border-left: 2px solid #dee2e6;
-        padding-left: 1rem;
-        margin-left: 1rem;
-    }
-</style>
 {% endblock %}
