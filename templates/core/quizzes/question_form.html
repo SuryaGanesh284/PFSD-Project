@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Add Question to {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="glass-panel p-5 fade-in">
+                <div class="d-flex align-items-center mb-4">
+                    <a href="{% url 'quiz_detail' quiz.pk %}" class="btn btn-outline-secondary btn-sm me-3 rounded-circle" style="width: 32px; height: 32px; padding: 0; line-height: 30px;">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h2 class="fw-bold mb-1">Add Question</h2>
+                        <p class="text-muted mb-0">For quiz: <strong>{{ quiz.title }}</strong></p>
+                    </div>
+                </div>
+                
+                <hr class="mb-4 text-muted">
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger shadow-sm">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-4">
+                        <label for="{{ form.text.id_for_label }}" class="form-label fw-bold">Question Text</label>
+                        {{ form.text }}
+                        {% if form.text.errors %}
+                        <div class="invalid-feedback d-block">{{ form.text.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <label for="{{ form.question_type.id_for_label }}" class="form-label fw-bold">Question Type</label>
+                            {{ form.question_type }}
+                            {% if form.question_type.errors %}
+                            <div class="invalid-feedback d-block">{{ form.question_type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <label for="{{ form.points.id_for_label }}" class="form-label fw-bold">Points</label>
+                            {{ form.points }}
+                            {% if form.points.errors %}
+                            <div class="invalid-feedback d-block">{{ form.points.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.order.id_for_label }}" class="form-label fw-bold">Display Order</label>
+                            {{ form.order }}
+                            {% if form.order.errors %}
+                            <div class="invalid-feedback d-block">{{ form.order.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.explanation.id_for_label }}" class="form-label fw-bold">Explanation (Optional)</label>
+                        <div class="form-text mb-2 text-muted">This will be shown to users after they answer the question to help them learn.</div>
+                        {{ form.explanation }}
+                        {% if form.explanation.errors %}
+                        <div class="invalid-feedback d-block">{{ form.explanation.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid mt-5">
+                        <button type="submit" class="btn btn-primary btn-lg shadow">
+                            <i class="bi bi-save me-2"></i>Save Question
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

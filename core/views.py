@@ -298,6 +298,8 @@ class QuizDetailView(DetailView):
     context_object_name = 'quiz'
     
     def get_queryset(self):
+        if self.request.user.is_authenticated and self.request.user.is_educator():
+            return Quiz.objects.all()
         return Quiz.objects.filter(is_published=True)
     
     def get_context_data(self, **kwargs):
@@ -338,6 +340,59 @@ class QuizCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     
     def get_success_url(self):
         return reverse_lazy('quiz_detail', kwargs={'pk': self.object.pk})
+
+
+class QuestionCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    """Create question for a quiz (educators only)."""
+    model = Question
+    form_class = QuestionForm
+    template_name = 'core/quizzes/question_form.html'
+    login_url = 'login'
+    
+    def test_func(self):
+        quiz = get_object_or_404(Quiz, pk=self.kwargs['quiz_id'])
+        return self.request.user.is_educator() and quiz.created_by == self.request.user
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['quiz'] = get_object_or_404(Quiz, pk=self.kwargs['quiz_id'])
+        return context
+    
+    def form_valid(self, form):
+        quiz = get_object_or_404(Quiz, pk=self.kwargs['quiz_id'])
+        form.instance.quiz = quiz
+        messages.success(self.request, 'Question added successfully!')
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('quiz_detail', kwargs={'pk': self.kwargs['quiz_id']})
+
+
+class ChoiceCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    """Create choice for a question (educators only)."""
+    model = Choice
+    form_class = ChoiceForm
+    template_name = 'core/quizzes/choice_form.html'
+    login_url = 'login'
+    
+    def test_func(self):
+        question = get_object_or_404(Question, pk=self.kwargs['question_id'])
+        return self.request.user.is_educator() and question.quiz.created_by == self.request.user
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['question'] = get_object_or_404(Question, pk=self.kwargs['question_id'])
+        return context
+    
+    def form_valid(self, form):
+        question = get_object_or_404(Question, pk=self.kwargs['question_id'])
+        form.instance.question = question
+        messages.success(self.request, 'Choice added successfully!')
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        question = get_object_or_404(Question, pk=self.kwargs['question_id'])
+        return reverse_lazy('quiz_detail', kwargs={'pk': question.quiz.pk})
 
 
 @login_required(login_url='login')

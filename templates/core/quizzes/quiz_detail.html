@@ -74,6 +74,62 @@
                 </div>
             </div>
 
+            {% if user == quiz.created_by and user.is_educator %}
+            <div class="card border-0 shadow-sm mb-4 border-start border-4 border-info">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0 text-info"><i class="bi bi-pencil-square me-2"></i>Educator Controls</h4>
+                        <a href="{% url 'add_question' quiz.pk %}" class="btn btn-primary shadow-sm">
+                            <i class="bi bi-plus-lg me-1"></i> Add Question
+                        </a>
+                    </div>
+                    
+                    {% if quiz.questions.all %}
+                        <div class="accordion" id="questionsAccordion">
+                        {% for question in quiz.questions.all %}
+                            <div class="accordion-item border-0 shadow-sm mb-3 rounded overflow-hidden">
+                                <h2 class="accordion-header" id="heading{{ question.id }}">
+                                    <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ question.id }}" aria-expanded="false" aria-controls="collapse{{ question.id }}">
+                                        <strong>Q{{ question.order }}:</strong>&nbsp;{{ question.text|truncatechars:50 }}
+                                        <span class="badge bg-secondary ms-auto">{{ question.points }} pt(s)</span>
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ question.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ question.id }}" data-bs-parent="#questionsAccordion">
+                                    <div class="accordion-body">
+                                        <p class="text-muted mb-3">{{ question.text }}</p>
+                                        
+                                        <h6 class="fw-bold mb-2">Choices:</h6>
+                                        <ul class="list-group list-group-flush mb-3 border rounded">
+                                        {% for choice in question.choices.all %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center {% if choice.is_correct %}list-group-item-success{% endif %}">
+                                                <span>{{ choice.text }}</span>
+                                                {% if choice.is_correct %}<i class="bi bi-check-circle-fill text-success"></i>{% endif %}
+                                            </li>
+                                        {% empty %}
+                                            <li class="list-group-item text-muted fst-italic text-center py-3">No choices added yet.</li>
+                                        {% endfor %}
+                                        </ul>
+                                        
+                                        <div class="text-end">
+                                            <a href="{% url 'add_choice' question.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-plus-circle me-1"></i> Add Choice
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4 bg-light rounded">
+                            <i class="bi bi-question-circle text-muted fs-1 mb-2 d-block"></i>
+                            <p class="text-muted mb-0">No questions added yet. Start building your quiz!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Quiz Information -->
             <div class="row mb-4">
                 <div class="col-md-6 mb-3">
