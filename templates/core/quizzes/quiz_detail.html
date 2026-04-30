@@ -91,7 +91,10 @@
                                 <h2 class="accordion-header" id="heading{{ question.id }}">
                                     <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ question.id }}" aria-expanded="false" aria-controls="collapse{{ question.id }}">
                                         <strong>Q{{ question.order }}:</strong>&nbsp;{{ question.text|truncatechars:50 }}
-                                        <span class="badge bg-secondary ms-auto">{{ question.points }} pt(s)</span>
+                                        <div class="ms-auto d-flex align-items-center">
+                                            <span class="badge bg-secondary me-2">{{ question.points }} pt(s)</span>
+                                            <a href="{% url 'edit_question' question.id %}" class="btn btn-sm btn-outline-secondary py-0 px-2" style="z-index: 10; position: relative;">Edit</a>
+                                        </div>
                                     </button>
                                 </h2>
                                 <div id="collapse{{ question.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ question.id }}" data-bs-parent="#questionsAccordion">
@@ -103,7 +106,10 @@
                                         {% for choice in question.choices.all %}
                                             <li class="list-group-item d-flex justify-content-between align-items-center {% if choice.is_correct %}list-group-item-success{% endif %}">
                                                 <span>{{ choice.text }}</span>
-                                                {% if choice.is_correct %}<i class="bi bi-check-circle-fill text-success"></i>{% endif %}
+                                                <div>
+                                                    <a href="{% url 'edit_choice' choice.id %}" class="btn btn-sm btn-outline-secondary py-0 px-2 me-2">Edit</a>
+                                                    {% if choice.is_correct %}<i class="bi bi-check-circle-fill text-success"></i>{% endif %}
+                                                </div>
                                             </li>
                                         {% empty %}
                                             <li class="list-group-item text-muted fst-italic text-center py-3">No choices added yet.</li>

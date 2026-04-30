@@ -32,7 +32,9 @@ urlpatterns = [
     path('quizzes/create/', views.QuizCreateView.as_view(), name='quiz_create'),
     path('quizzes/<int:pk>/', views.QuizDetailView.as_view(), name='quiz_detail'),
     path('quizzes/<int:quiz_id>/add-question/', views.QuestionCreateView.as_view(), name='add_question'),
+    path('questions/<int:pk>/edit/', views.QuestionUpdateView.as_view(), name='edit_question'),
     path('questions/<int:question_id>/add-choice/', views.ChoiceCreateView.as_view(), name='add_choice'),
+    path('choices/<int:pk>/edit/', views.ChoiceUpdateView.as_view(), name='edit_choice'),
     path('quizzes/<int:pk>/take/', views.quiz_take_view, name='quiz_take'),
     path('quizzes/result/<int:pk>/', views.QuizResultView.as_view(), name='quiz_result'),
     

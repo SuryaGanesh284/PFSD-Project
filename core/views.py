@@ -395,6 +395,56 @@ class ChoiceCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return reverse_lazy('quiz_detail', kwargs={'pk': question.quiz.pk})
 
 
+class QuestionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """Update question for a quiz (educators only)."""
+    model = Question
+    form_class = QuestionForm
+    template_name = 'core/quizzes/question_form.html'
+    login_url = 'login'
+    
+    def test_func(self):
+        question = self.get_object()
+        return self.request.user.is_educator() and question.quiz.created_by == self.request.user
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['quiz'] = self.get_object().quiz
+        context['is_update'] = True
+        return context
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Question updated successfully!')
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('quiz_detail', kwargs={'pk': self.object.quiz.pk})
+
+
+class ChoiceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """Update choice for a question (educators only)."""
+    model = Choice
+    form_class = ChoiceForm
+    template_name = 'core/quizzes/choice_form.html'
+    login_url = 'login'
+    
+    def test_func(self):
+        choice = self.get_object()
+        return self.request.user.is_educator() and choice.question.quiz.created_by == self.request.user
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['question'] = self.get_object().question
+        context['is_update'] = True
+        return context
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Choice updated successfully!')
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('quiz_detail', kwargs={'pk': self.object.question.quiz.pk})
+
+
 @login_required(login_url='login')
 def quiz_take_view(request, pk):
     """Take a quiz."""
