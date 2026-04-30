@@ -32,6 +32,7 @@ SECRET_KEY = 'django-insecure-osw4-41=29fbg4ik-d2!2@#(n!x$%se@zia*cyl2&3lr#06v4q
 DEBUG = True
 
 ALLOWED_HOSTS = ['*', '.pythonanywhere.com']
+CSRF_TRUSTED_ORIGINS = ['https://*.up.railway.app', 'https://*.pythonanywhere.com']
 
 
 # Application definition
